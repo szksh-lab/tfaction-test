@@ -1,0 +1,54 @@
+---
+name: apply
+on:
+  push:
+    branches:
+      - main
+jobs:
+  apply:
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    env:
+      TFACTION_JOB_TYPE: terraform
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Create GitHub App installation access token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+          permission-actions: read
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Set up
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: setup
+          github_token: ${{ steps.token.outputs.token }}
+
+      - name: terraform init
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: terraform-init
+          github_token: ${{ steps.token.outputs.token }}
+
+      - name: Apply
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: apply
+          github_token: ${{ steps.token.outputs.token }}
+
+      - name: Create follow up PR
+        uses: suzuki-shunsuke/tfaction@latest
+        if: failure()
+        with:
+          action: create-follow-up-pr
+          github_token: ${{ steps.token.outputs.token }}
