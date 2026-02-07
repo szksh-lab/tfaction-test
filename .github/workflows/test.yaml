@@ -1,0 +1,34 @@
+---
+name: test
+on: pull_request
+jobs:
+  plan:
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+      contents: read
+    env:
+      # TFACTION_TARGET: ""
+      # TFACTION_WORKING_DIR: ""
+      TFACTION_JOB_TYPE: terraform
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Set up
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: setup
+
+      - name: terraform init
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: terraform-init
+
+      - name: Plan
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: plan
