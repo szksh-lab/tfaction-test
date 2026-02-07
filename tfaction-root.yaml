@@ -1,0 +1,4 @@
+plan_workflow_name: test.yaml
+
+target_groups:
+  - working_directory: ""
