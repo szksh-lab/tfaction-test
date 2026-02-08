@@ -31,15 +31,41 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
 
+  list:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read # For checkout a private repository
+    outputs:
+      targets: ${{steps.list-targets.outputs.targets}}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: List Targets
+        uses: suzuki-shunsuke/tfaction@latest
+        id: list-targets
+        with:
+          action: list-targets
+
   plan:
+    name: "plan (${{matrix.target.target}})"
     timeout-minutes: 60
     runs-on: ubuntu-24.04
+    needs: [list]
     permissions:
       contents: read
     env:
-      # TFACTION_TARGET: ""
-      # TFACTION_WORKING_DIR: ""
-      TFACTION_JOB_TYPE: terraform
+      TFACTION_TARGET: "${{matrix.target.target}}"
+      TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
+      TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
+    if: "join(fromJSON(needs.setup.outputs.targets), '') != ''"
+    strategy:
+      fail-fast: true
+      matrix:
+        target: ${{fromJSON(needs.setup.outputs.targets)}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
