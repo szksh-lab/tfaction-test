@@ -1,0 +1,6 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/github-comment/v6.3.1/json-schema/github-comment.json
+# https://github.com/suzuki-shunsuke/github-comment
+hide:
+  default: |
+    Comment.HasMeta && Comment.Meta.SHA1 != Commit.SHA1 && ! (Comment.Meta.Program == "tfcmt" && Comment.Meta.Command == "apply")
