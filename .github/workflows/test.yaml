@@ -61,7 +61,7 @@ jobs:
       TFACTION_TARGET: "${{matrix.target.target}}"
       TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
       TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
-    if: "join(fromJSON(needs.setup.outputs.targets), '') != ''"
+    if: "join(fromJSON(needs.list.outputs.targets), '') != ''"
     strategy:
       fail-fast: false
       matrix:
