@@ -93,6 +93,12 @@ jobs:
           action: terraform-init
           github_token: ${{ steps.token.outputs.token }}
 
+      - name: Lint
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: test
+          github_token: ${{ steps.token.outputs.token }}
+
       - name: Plan
         uses: suzuki-shunsuke/tfaction@latest
         with:
