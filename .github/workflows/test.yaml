@@ -61,6 +61,7 @@ jobs:
       TFACTION_TARGET: "${{matrix.target.target}}"
       TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
       TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
+      TFLINT_CONFIG_FILE: ${{github.workspace}}/.tflint.hcl
     if: "join(fromJSON(needs.list.outputs.targets), '') != ''"
     strategy:
       fail-fast: false
