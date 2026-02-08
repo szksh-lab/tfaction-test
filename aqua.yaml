@@ -12,3 +12,4 @@ registries:
     ref: v4.467.0 # renovate: depName=aquaproj/aqua-registry
 packages:
   - name: hashicorp/terraform@v1.14.4
+  - name: suzuki-shunsuke/github-comment@v6.4.1

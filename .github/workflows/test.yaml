@@ -2,6 +2,35 @@
 name: test
 on: pull_request
 jobs:
+  hide-comment:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Install aqua
+        uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
+        with:
+          aqua_version: v2.56.6
+
+      - name: Create GitHub App installation access token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        id: token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+          permission-pull-requests: write
+
+      - name: Hide old comments
+        run: github-comment hide
+        env:
+          GITHUB_TOKEN: ${{ steps.token.outputs.token }}
+
   plan:
     timeout-minutes: 60
     runs-on: ubuntu-24.04
