@@ -1,4 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/tfaction/refs/heads/latest/schema/tfaction-root.json
 plan_workflow_name: test.yaml
+
+terraform_docs:
+  enabled: true
+
+tflint:
+  enabled: true
+trivy:
+  enabled: true
 
 target_groups:
   - working_directory: ""
