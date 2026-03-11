@@ -1,3 +1,5 @@
 provider "null" {}
 
-provider "github" {}
+provider "github" {
+  owner = "szksh-lab"
+}
