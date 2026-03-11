@@ -10,5 +10,5 @@ trivy:
   enabled: true
 
 target_groups:
-  - working_directory: ""
+  - working_directory: "**"
     template_dir: templates/hello
