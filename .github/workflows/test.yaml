@@ -94,6 +94,6 @@ jobs:
     # needs.<job_id>.outputs.result_summary
     steps:
       - name: Add plan label
-        uses: suzuki-shunsuke/tfaction@latest
+        uses: suzuki-shunsuke/tfaction@pr/3728
         with:
           action: plan-label
