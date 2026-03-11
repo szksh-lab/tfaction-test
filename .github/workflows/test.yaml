@@ -89,6 +89,7 @@ jobs:
     needs: [plan]
     permissions:
       pull-requests: read
+      issues: write
     # no-op, create, update, delete
     # https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#needs-context
     # needs.<job_id>.outputs.result_summary
