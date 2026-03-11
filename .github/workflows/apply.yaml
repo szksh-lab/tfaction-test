@@ -5,6 +5,26 @@ on:
     branches:
       - main
 jobs:
+  list:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      targets: ${{steps.list-targets.outputs.targets}}
+      pr_number: ${{steps.list-targets.outputs.pr_number}}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: List Targets
+        uses: suzuki-shunsuke/tfaction@pr/3727
+        id: list-targets
+        with:
+          action: list-targets
+
   apply:
     timeout-minutes: 60
     runs-on: ubuntu-24.04
@@ -52,3 +72,15 @@ jobs:
         with:
           action: create-follow-up-pr
           github_token: ${{ steps.token.outputs.token }}
+
+  apply-label:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    needs: [apply, list]
+    if: always()
+    steps:
+      - uses: suzuki-shunsuke/tfaction@pr/3727
+        with:
+          action: apply-label
+          pr_number: ${{needs.list.outputs.pr_number}}
+          result: ${{ needs.test.result }} # success, failure, cancelled, or skipped
