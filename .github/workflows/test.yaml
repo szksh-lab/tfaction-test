@@ -2,23 +2,12 @@
 name: test
 on: pull_request
 jobs:
-  hide-comment:
-    timeout-minutes: 10
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - name: Hide old comments
-        uses: suzuki-shunsuke/tfaction@latest
-        with:
-          action: hide-comment
-
   list:
     timeout-minutes: 10
     runs-on: ubuntu-24.04
     permissions:
       contents: read # For checkout a private repository
+      pull-requests: write
     outputs:
       targets: ${{steps.list-targets.outputs.targets}}
     steps:
@@ -32,6 +21,11 @@ jobs:
         id: list-targets
         with:
           action: list-targets
+
+      - name: Hide old comments
+        uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: hide-comment
 
   plan:
     name: "plan (${{matrix.target.target}})"
@@ -88,3 +82,18 @@ jobs:
         with:
           action: plan
           github_token: ${{ steps.token.outputs.token }}
+
+  plan-label:
+    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    needs: [plan]
+    permissions:
+      pull-requests: read
+    # no-op, create, update, delete
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#needs-context
+    # needs.<job_id>.outputs.result_summary
+    steps:
+      - name: Add plan label
+        uses: suzuki-shunsuke/tfaction@pr/3725
+        with:
+          action: plan-label
