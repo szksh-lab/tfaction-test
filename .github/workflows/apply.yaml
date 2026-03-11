@@ -86,7 +86,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-24.04
     needs: [apply, list]
-    if: always()
+    if: "always() && join(fromJSON(needs.list.outputs.targets), '') != ''"
     permissions:
       pull-requests: write
     steps:
