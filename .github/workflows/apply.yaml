@@ -94,4 +94,4 @@ jobs:
         with:
           action: apply-label
           pr_number: ${{needs.list.outputs.pr_number}}
-          result: ${{ needs.test.result }} # success, failure, cancelled, or skipped
+          result: ${{ needs.apply.result }} # success, failure, cancelled, or skipped
