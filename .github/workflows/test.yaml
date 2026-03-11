@@ -71,6 +71,24 @@ jobs:
           action: terraform-init
           github_token: ${{ steps.token.outputs.token }}
 
+      - run: trivy config --format sarif . > sarif.json
+        working-directory: ${{matrix.target.working_directory}}
+        env:
+          GITHUB_TOKEN: ${{ steps.token.outputs.token }}
+      - run: cat sarif.json
+        working-directory: ${{matrix.target.working_directory}}
+      - run: |
+          cat sarif.json |
+            reviewdog -f sarif \
+              -name trivy \
+              -filter-mode nofilter \
+              -reporter github-pr-review \
+              -level warning \
+              -fail-level any
+        working-directory: ${{matrix.target.working_directory}}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ steps.token.outputs.token }}
+
       - name: Lint
         uses: suzuki-shunsuke/tfaction@latest
         with:
