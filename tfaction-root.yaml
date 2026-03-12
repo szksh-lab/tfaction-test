@@ -4,6 +4,11 @@ plan_workflow_name: test.yaml
 terraform_docs:
   enabled: true
 
+labels:
+  - regexp: "^.*foo$"
+    label: foo2
+    color: 8e1f1b
+
 tflint:
   enabled: true
 trivy:
