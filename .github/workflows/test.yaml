@@ -1,13 +1,42 @@
 name: test
 on: pull_request
 jobs:
-  plan:
-    timeout-minutes: 30
+  list:
+    timeout-minutes: 10
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    outputs:
+      targets: ${{steps.list-targets.outputs.targets}}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: List Targets
+        uses: suzuki-shunsuke/tfaction@latest
+        id: list-targets
+        with:
+          action: list-targets
+
+  plan:
+    name: "plan (${{matrix.target.target}})" # Different job name per root module
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    needs: [list] # Run after list
+    permissions:
+      contents: read
     env:
-      TFACTION_JOB_TYPE: terraform
+      # Set environment variables per root module
+      TFACTION_TARGET: "${{matrix.target.target}}"
+      TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
+      TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
+    if: "join(fromJSON(needs.list.outputs.targets), '') != ''" # Skip if no root modules changed
+    strategy:
+      fail-fast: false # Continue other root modules even if one fails
+      matrix:
+        target: ${{fromJSON(needs.list.outputs.targets)}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
