@@ -2,23 +2,9 @@ name: test
 on: pull_request
 jobs:
   list:
-    timeout-minutes: 10
-    runs-on: ubuntu-24.04
+    uses: ./.github/workflows/workflow_call_list.yaml
     permissions:
       contents: read
-    outputs:
-      targets: ${{steps.list-targets.outputs.targets}}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          persist-credentials: false
-
-      - name: List Targets
-        uses: suzuki-shunsuke/tfaction@latest
-        id: list-targets
-        with:
-          action: list-targets
 
   plan:
     name: "plan (${{matrix.target.target}})" # Different job name per root module
@@ -44,7 +30,7 @@ jobs:
           persist-credentials: false
 
       - name: Create GitHub App installation access token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         id: token
         with:
           app-id: ${{ vars.APP_ID }}
