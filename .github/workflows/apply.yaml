@@ -5,13 +5,28 @@ on:
     branches:
       - main
 jobs:
+  list:
+    uses: ./.github/workflows/workflow_call_list.yaml
+    permissions:
+      contents: read
+
   apply:
     timeout-minutes: 60
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    name: "apply (${{matrix.target.target}})" # Different job name per root module
+    needs: [list] # Run after list
     env:
-      TFACTION_JOB_TYPE: terraform
+      # Set environment variables per root module
+      TFACTION_TARGET: "${{matrix.target.target}}"
+      TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
+      TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
+    if: "join(fromJSON(needs.list.outputs.targets), '') != ''" # Skip if no root modules changed
+    strategy:
+      fail-fast: false # Continue other root modules even if one fails
+      matrix:
+        target: ${{fromJSON(needs.list.outputs.targets)}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
