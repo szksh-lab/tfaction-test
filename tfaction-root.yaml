@@ -3,3 +3,5 @@ available_providers:
   - name: registry.terraform.io/hashicorp/null
 target_groups:
   - working_directory: "**"
+update_local_path_module_caller:
+  enabled: true
