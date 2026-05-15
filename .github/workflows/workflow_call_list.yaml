@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+      pull-requests: write # to post comments
     outputs:
       targets: ${{steps.list-targets.outputs.targets}}
     steps:
