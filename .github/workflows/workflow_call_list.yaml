@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
 
       - name: List Targets
-        uses: suzuki-shunsuke/tfaction@pr/3944
+        uses: suzuki-shunsuke/tfaction@latest
         id: list-targets
         with:
           action: list-targets
