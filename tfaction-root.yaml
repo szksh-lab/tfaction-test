@@ -7,6 +7,6 @@ update_local_path_module_caller:
   enabled: false
 
 tflint:
-  enabled: false
+  enabled: true
 trivy:
   enabled: false
