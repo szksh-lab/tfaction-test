@@ -4,4 +4,9 @@ available_providers:
 target_groups:
   - working_directory: "**"
 update_local_path_module_caller:
+  enabled: false
+
+tflint:
   enabled: true
+trivy:
+  enabled: false

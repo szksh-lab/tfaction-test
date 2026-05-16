@@ -5,6 +5,7 @@ jobs:
     uses: ./.github/workflows/workflow_call_list.yaml
     permissions:
       contents: read
+      pull-requests: write
 
   plan:
     name: "plan (${{matrix.target.target}})" # Different job name per root module
@@ -45,13 +46,19 @@ jobs:
           github_token: ${{ steps.token.outputs.token }}
 
       - name: terraform init
-        uses: suzuki-shunsuke/tfaction@latest
+        uses: suzuki-shunsuke/tfaction@pr/3946
         with:
           action: terraform-init
           github_token: ${{ steps.token.outputs.token }}
 
+      - name: Lint
+        uses: suzuki-shunsuke/tfaction@pr/3946
+        with:
+          action: test
+          github_token: ${{ steps.token.outputs.token }}
+
       - name: Plan
-        uses: suzuki-shunsuke/tfaction@latest
+        uses: suzuki-shunsuke/tfaction@pr/3946
         with:
           action: plan
           github_token: ${{ steps.token.outputs.token }}

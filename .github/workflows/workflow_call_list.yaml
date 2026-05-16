@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+      pull-requests: write # to post comments
     outputs:
       targets: ${{steps.list-targets.outputs.targets}}
     steps:
@@ -20,7 +21,7 @@ jobs:
           persist-credentials: false
 
       - name: List Targets
-        uses: suzuki-shunsuke/tfaction@latest
+        uses: suzuki-shunsuke/tfaction@pr/3946
         id: list-targets
         with:
           action: list-targets
