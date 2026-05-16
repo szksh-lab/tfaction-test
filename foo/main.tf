@@ -7,4 +7,3 @@ module "db" {
 
 locals {
   foo = foo
-}
