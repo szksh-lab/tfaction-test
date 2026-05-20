@@ -62,6 +62,6 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: suzuki-shunsuke/tfaction@latest
+      - uses: suzuki-shunsuke/tfaction@pr/3962
         with:
-          action: hide-comment
+          action: delete-comment
