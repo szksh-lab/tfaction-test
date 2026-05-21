@@ -1,6 +1,7 @@
 plan_workflow_name: test.yaml
 available_providers:
   - name: registry.terraform.io/hashicorp/null
+  - name: registry.terraform.io/integrations/github
 target_groups:
   - working_directory: "**"
 update_local_path_module_caller:
