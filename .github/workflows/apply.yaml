@@ -43,6 +43,10 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
 
+      - uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: get-or-create-drift-issue
+
       - name: Set up
         uses: suzuki-shunsuke/tfaction@latest
         with:
@@ -60,3 +64,9 @@ jobs:
         with:
           action: apply
           github_token: ${{ steps.token.outputs.token }}
+
+      - uses: suzuki-shunsuke/tfaction@latest
+        if: always()
+        with:
+          action: update-drift-issue
+          status: ${{job.status}}
