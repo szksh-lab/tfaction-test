@@ -12,4 +12,4 @@ drift_detection:
   # issue_repo_name: tfaction-example
   # Maximum number of drift issues processed per scheduled job run. Default is 1.
   num_of_issues: 1
-  minimum_detection_interval: 1
+  minimum_detection_interval: 0
