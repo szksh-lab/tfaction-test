@@ -51,7 +51,7 @@ jobs:
           github_token: ${{ steps.token.outputs.token }}
 
       - name: Lint
-        uses: suzuki-shunsuke/tfaction@pr/3968
+        uses: suzuki-shunsuke/tfaction@pr/3969
         with:
           action: test
           github_token: ${{ steps.token.outputs.token }}
