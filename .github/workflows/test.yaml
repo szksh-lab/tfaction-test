@@ -50,13 +50,19 @@ jobs:
           action: terraform-init
           github_token: ${{ steps.token.outputs.token }}
 
+      - name: Lint
+        uses: suzuki-shunsuke/tfaction@pr/3968
+        with:
+          action: test
+          github_token: ${{ steps.token.outputs.token }}
+
       - name: Plan
         uses: suzuki-shunsuke/tfaction@latest
         with:
           action: plan
           github_token: ${{ steps.token.outputs.token }}
 
-  hide-comment:
+  delete-comment:
     timeout-minutes: 10
     runs-on: ubuntu-24.04
     permissions:
@@ -64,4 +70,4 @@ jobs:
     steps:
       - uses: suzuki-shunsuke/tfaction@latest
         with:
-          action: hide-comment
+          action: delete-comment
