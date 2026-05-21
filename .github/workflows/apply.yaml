@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+      issues: write
     name: "apply (${{matrix.target.target}})" # Different job name per root module
     needs: [list] # Run after list
     env:
