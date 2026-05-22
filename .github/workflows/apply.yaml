@@ -67,8 +67,22 @@ jobs:
           action: apply
           github_token: ${{ steps.token.outputs.token }}
 
+      - name: Create follow up PR
+        uses: suzuki-shunsuke/tfaction@latest
+        if: failure()
+        with:
+          action: create-follow-up-pr
+          github_token: ${{ steps.token.outputs.token }}
+
       - uses: suzuki-shunsuke/tfaction@latest
         if: always()
         with:
           action: update-drift-issue
           status: ${{job.status}}
+
+      - name: Update related PR branches
+        uses: suzuki-shunsuke/tfaction@latest
+        if: always()
+        with:
+          action: update-pr-branch
+          github_token: ${{ steps.token.outputs.token }}
