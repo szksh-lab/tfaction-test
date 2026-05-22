@@ -6,49 +6,36 @@ on:
       - main
 jobs:
   list:
-    timeout-minutes: 10
-    runs-on: ubuntu-24.04
+    uses: ./.github/workflows/workflow_call_list.yaml
     permissions:
       contents: read
-    outputs:
-      targets: ${{steps.list-targets.outputs.targets}}
-      pr_number: ${{steps.list-targets.outputs.pr_number}}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          persist-credentials: false
-
-      - name: List Targets
-        uses: suzuki-shunsuke/tfaction@pr/3727
-        id: list-targets
-        with:
-          action: list-targets
 
   apply:
     timeout-minutes: 60
     runs-on: ubuntu-24.04
-    needs: [list]
     permissions:
       contents: read
+      issues: write
+    name: "apply (${{matrix.target.target}})" # Different job name per root module
+    needs: [list] # Run after list
     env:
+      # Set environment variables per root module
       TFACTION_TARGET: "${{matrix.target.target}}"
       TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
       TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
-      TFLINT_CONFIG_FILE: ${{github.workspace}}/.tflint.hcl
-    if: "join(fromJSON(needs.list.outputs.targets), '') != ''"
+    if: "join(fromJSON(needs.list.outputs.targets), '') != ''" # Skip if no root modules changed
     strategy:
-      fail-fast: false
+      fail-fast: false # Continue other root modules even if one fails
       matrix:
         target: ${{fromJSON(needs.list.outputs.targets)}}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Create GitHub App installation access token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         id: token
         with:
           app-id: ${{ vars.APP_ID }}
@@ -56,6 +43,11 @@ jobs:
           permission-actions: read
           permission-contents: write
           permission-pull-requests: write
+          permission-issues: write
+
+      - uses: suzuki-shunsuke/tfaction@latest
+        with:
+          action: get-or-create-drift-issue
 
       - name: Set up
         uses: suzuki-shunsuke/tfaction@latest
@@ -82,16 +74,15 @@ jobs:
           action: create-follow-up-pr
           github_token: ${{ steps.token.outputs.token }}
 
-  apply-label:
-    timeout-minutes: 10
-    runs-on: ubuntu-24.04
-    needs: [apply, list]
-    if: "always() && join(fromJSON(needs.list.outputs.targets), '') != ''"
-    permissions:
-      pull-requests: write
-    steps:
-      - uses: suzuki-shunsuke/tfaction@pr/3727
+      - uses: suzuki-shunsuke/tfaction@latest
+        if: always()
         with:
-          action: apply-label
-          pr_number: ${{needs.list.outputs.pr_number}}
-          result: ${{ needs.apply.result }} # success, failure, cancelled, or skipped
+          action: update-drift-issue
+          status: ${{job.status}}
+
+      - name: Update related PR branches
+        uses: suzuki-shunsuke/tfaction@latest
+        if: always()
+        with:
+          action: update-pr-branch
+          github_token: ${{ steps.token.outputs.token }}

@@ -1,57 +1,36 @@
----
 name: test
 on: pull_request
 jobs:
   list:
-    timeout-minutes: 10
-    runs-on: ubuntu-24.04
+    uses: ./.github/workflows/workflow_call_list.yaml
     permissions:
-      contents: read # For checkout a private repository
-      pull-requests: write
-    outputs:
-      targets: ${{steps.list-targets.outputs.targets}}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          persist-credentials: false
-
-      - name: List Targets
-        uses: suzuki-shunsuke/tfaction@latest
-        id: list-targets
-        with:
-          action: list-targets
-
-      - name: Hide old comments
-        uses: suzuki-shunsuke/tfaction@latest
-        with:
-          action: hide-comment
+      contents: read
 
   plan:
-    name: "plan (${{matrix.target.target}})"
-    timeout-minutes: 60
+    name: "plan (${{matrix.target.target}})" # Different job name per root module
+    timeout-minutes: 30
     runs-on: ubuntu-24.04
-    needs: [list]
+    needs: [list] # Run after list
     permissions:
       contents: read
     env:
+      # Set environment variables per root module
       TFACTION_TARGET: "${{matrix.target.target}}"
       TFACTION_WORKING_DIR: ${{matrix.target.working_directory}}
       TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
-      TFLINT_CONFIG_FILE: ${{github.workspace}}/.tflint.hcl
-    if: "join(fromJSON(needs.list.outputs.targets), '') != ''"
+    if: "join(fromJSON(needs.list.outputs.targets), '') != ''" # Skip if no root modules changed
     strategy:
-      fail-fast: false
+      fail-fast: false # Continue other root modules even if one fails
       matrix:
         target: ${{fromJSON(needs.list.outputs.targets)}}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Create GitHub App installation access token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         id: token
         with:
           app-id: ${{ vars.APP_ID }}
@@ -83,17 +62,12 @@ jobs:
           action: plan
           github_token: ${{ steps.token.outputs.token }}
 
-  plan-label:
+  delete-comment:
     timeout-minutes: 10
     runs-on: ubuntu-24.04
-    needs: [plan]
     permissions:
       pull-requests: write
-    # no-op, create, update, delete
-    # https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#needs-context
-    # needs.<job_id>.outputs.result_summary
     steps:
-      - name: Add plan label
-        uses: suzuki-shunsuke/tfaction@latest
+      - uses: suzuki-shunsuke/tfaction@latest
         with:
-          action: plan-label
+          action: delete-comment
