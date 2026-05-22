@@ -62,7 +62,7 @@ jobs:
           github_token: ${{ steps.token.outputs.token }}
 
       - name: Apply
-        uses: suzuki-shunsuke/tfaction@latest
+        uses: suzuki-shunsuke/tfaction@pr/3978
         with:
           action: apply
           github_token: ${{ steps.token.outputs.token }}
