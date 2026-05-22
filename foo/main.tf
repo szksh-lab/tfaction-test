@@ -5,13 +5,13 @@ module "db" {
 }
 
 resource "github_branch_protection" "good_example" {
-  repository_id = "example"
-  pattern       = "main"
-  # require_signed_commits = true
+  repository_id          = "example"
+  pattern                = "main"
+  require_signed_commits = true
 }
 
 terraform {
-  # required_version = ">= 1.0.0"
+  required_version = ">= 1.0.0"
   required_providers {
     null = {
       source  = "hashicorp/null"
