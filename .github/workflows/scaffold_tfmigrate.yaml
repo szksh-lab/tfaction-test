@@ -16,7 +16,7 @@ on:
         description: Pull Request Number
         required: false
 env:
-  TFACTION_WORKING_DIRECTORY: ${{github.event.inputs.working_directory}}
+  TFACTION_WORKING_DIR: ${{github.event.inputs.working_directory}}
 jobs:
   scaffold:
     timeout-minutes: 30
