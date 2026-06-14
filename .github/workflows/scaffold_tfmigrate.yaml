@@ -1,0 +1,50 @@
+---
+# This workflow is optional
+# https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/tfmigrate
+name: Scaffold tfmigrate
+run-name: Scaffold tfmigrate (${{inputs.working_directory}})
+on:
+  workflow_dispatch:
+    inputs:
+      working_directory:
+        description: "target"
+        required: true
+      migration_name:
+        description: 'migration name. e.g. "import_foo"'
+        required: true
+      pr_number:
+        description: Pull Request Number
+        required: false
+env:
+  TFACTION_WORKING_DIRECTORY: ${{github.event.inputs.working_directory}}
+jobs:
+  scaffold:
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Generate token
+        id: token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write # Push commits
+          permission-pull-requests: write # Create a pull request
+
+      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
+        with:
+          aqua_version: v2.60.0
+
+      - uses: suzuki-shunsuke/tfaction@latest
+        # https://suzuki-shunsuke.github.io/tfaction/docs/unreleased/tfmigrate
+        with:
+          action: scaffold-tfmigrate
+          github_token: ${{steps.token.outputs.token}}
+          migration_name: ${{github.event.inputs.migration_name}}
+          pr_number: ${{inputs.pr_number}}
